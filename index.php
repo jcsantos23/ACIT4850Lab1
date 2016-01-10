@@ -20,56 +20,91 @@ and open the template in the editor.
             $position = "---------";
             echo 'No board parameter yet.';
             echo '<br />';
-        } else {
-            $position = $_GET['board'];
         }
+        display();
 
-        $squares = str_split($position);
+        $game = new Game($squares);
 
-        if (winner('x', $squares)) {
-            echo 'You win.';
-        } else if (winner('o', $squares)) {
-            echo 'I win.';
+        if ($game->winner('x')) {
+            echo 'You win. Lucky guesses!';
+        } else if ($game->winner('o')) {
+            echo 'I win. Muahahahaha';
         } else {
-            echo 'No winner yet.';
+            echo 'No winner yet, but you are losing.';
         }
         ?>
     </body>
 </html>
 <?php
 
-function winner($token, $position) {
+class Game {
 
-    for ($row = 0; $row < 3; $row++) {
+    var $position;
 
-        //Horizontal
-        if (($position[3 * $row] == $token) &&
-                ($position[3 * $row + 1] == $token) &&
-                ($position[3 * $row + 2] == $token)) {
+    function _construct($square) {
+        $this->position = str_split($square);
+    }
+
+    function winner($token) {
+
+        for ($row = 0; $row < 3; $row++) {
+
+            //Horizontal
+            if (($this->position[3 * $row] == $token) &&
+                    ($this->position[3 * $row + 1] == $token) &&
+                    ($this->position[3 * $row + 2] == $token)) {
+                $won = true;
+            }
+
+            //Vertical
+            if (($this->position[$row] == $token) &&
+                    ($this->position[$row + 3] == $token) &&
+                    ($this->position[$row + 6] == $token)) {
+                $won = true;
+            }
+        }
+
+        //Diagonal
+        if (($this->position[0] == $token) &&
+                ($this->position[4] == $token) &&
+                ($this->position[8] == $token)) {
             $won = true;
         }
 
-        //Vertical
-        if (($position[$row] == $token) &&
-                ($position[$row + 3] == $token) &&
-                ($position[$row + 6] == $token)) {
+        if (($this->position[2] == $token) &&
+                ($this->position[4] == $token) &&
+                ($this->position[6] == $token)) {
             $won = true;
         }
     }
 
-    //Diagonal
-    if (($position[0] == $token) &&
-            ($position[4] == $token) &&
-            ($position[8] == $token)) {
-        $won = true;
-    }
-    
-    if (($position[2] == $token) &&
-            ($position[4] == $token) &&
-            ($position[6] == $token)) {
-        $won = true;
+    function show_cell($which) {
+        $token = $this->position[$which];
+        //deal with the easy case
+        if ($token <> '-') {
+            return '<td>' . $token . '</td>';
+        }
+        //deal with the hard case
+        $this->newposition = $this->position; // copy the original
+        $this->newposition[$which] = 'o'; // this would be their move
+        $move = implode($this->newposition); // make a string from the board array
+        $link = '/?board=' . $move; // this is what we want the link to be
+        // so return a cell conatining an anchor and showing a hyphen
+        return '<td><a href="' . $link . '">-</a></td>';
     }
 
-    return $won;
+}
+
+function display() {
+    echo '<table cols="3" style="font-size:large; font-weight:bold">';
+    echo '<tr>';
+    for ($pos = 0; $pos < 9; $pos++) {
+        echo $this->show_cell($pos);
+        if ($pos % 3 == 2) {
+            echo '</tr><tr>';
+        }
+    }
+    echo '</tr>';
+    echo '</table>';
 }
 ?>
