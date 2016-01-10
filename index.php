@@ -16,7 +16,14 @@ and open the template in the editor.
         echo "Hello World!!";
         echo "<br />";
 
-        $position = $_GET['board'];
+        if (!isset($_GET['board'])) {
+            $position = "---------";
+            echo 'No board parameter yet.';
+            echo '<br />';
+        } else {
+            $position = $_GET['board'];
+        }
+
         $squares = str_split($position);
 
         if (winner('x', $squares)) {
@@ -32,36 +39,22 @@ and open the template in the editor.
 <?php
 
 function winner($token, $position) {
-    $won = false;
 
-    //Horizontal
-    if (($position[0] == $token) &&
-            ($position[1] == $token) &&
-            ($position[2] == $token)) {
-        $won = true;
-    } else if (($position[3] == $token) &&
-            ($position[4] == $token) &&
-            ($position[5] == $token)) {
-        $won = true;
-    } else if (($position[6] == $token) &&
-            ($position[7] == $token) &&
-            ($position[8] == $token)) {
-        $won = true;
-    }
+    for ($row = 0; $row < 3; $row++) {
 
-    //Vertical
-    if (($position[0] == $token) &&
-            ($position[3] == $token) &&
-            ($position[6] == $token)) {
-        $won = true;
-    } else if (($position[1] == $token) &&
-            ($position[4] == $token) &&
-            ($position[7] == $token)) {
-        $won = true;
-    } else if (($position[2] == $token) &&
-            ($position[5] == $token) &&
-            ($position[8] == $token)) {
-        $won = true;
+        //Horizontal
+        if (($position[3 * $row] == $token) &&
+                ($position[3 * $row + 1] == $token) &&
+                ($position[3 * $row + 2] == $token)) {
+            $won = true;
+        }
+
+        //Vertical
+        if (($position[$row] == $token) &&
+                ($position[$row + 3] == $token) &&
+                ($position[$row + 6] == $token)) {
+            $won = true;
+        }
     }
 
     //Diagonal
@@ -69,7 +62,9 @@ function winner($token, $position) {
             ($position[4] == $token) &&
             ($position[8] == $token)) {
         $won = true;
-    } else if (($position[2] == $token) &&
+    }
+    
+    if (($position[2] == $token) &&
             ($position[4] == $token) &&
             ($position[6] == $token)) {
         $won = true;
